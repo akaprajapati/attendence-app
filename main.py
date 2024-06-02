@@ -83,8 +83,22 @@ def logA(action: str):
     return {"id": id}
 
 @app.get('/getLog')
-def getLog():
-    return db.all()
+def get_log():
+    attendance_logs = attendance_log_table.all()
+    log_with_names = []
+
+    for log in attendance_logs:
+        user = users_table.search(Query().rfid_tag == log['rfid_tag'])
+        if user:
+            user = user[0]
+            log_with_names.append({
+                "name": user["name"],
+                "rfid_tag": log["rfid_tag"],
+                "role": log["role"],
+                "attendance_time": log["attendance_time"]
+            })
+
+    return log_with_names
 
 @app.get("/access/{id}")
 def req_access(id: str):
